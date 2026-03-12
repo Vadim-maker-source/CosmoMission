@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  password String
+  firstName String
+  lastName String
+  age Int
+  phone String
+  role String @default("user")
+  avatar String?
+  region String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings Booking[]
+}
+
+enum BookingStatus {
+  DRAFT // Черновик
+  CONFIRMED // Подтвержден
+  PAID // Оплачен
+  CANCELLED // Отменен
+  COMPLETED // Завершен
+}
+
+model Booking {
+  id String         @id @default(cuid())
+  bookingNumber String
+  userId String
+  user User           @relation(fields: [userId], references: [id])
+  
+  // Маршрут массив путей в выбранной последовательности
+  routeIds Json
+  
+  // Длительность пребывания на каждой станции
+  durations Json
+  
+  // Желаемая дата вылета
+  departureDate DateTime
+  
+  status BookingStatus  @default(DRAFT)
+  
+  passengers Passenger[]
+  
+  // Общая информация
+  totalPassengers Int            @default(1)
+  notes String? // Пожелания
+  
+  // Временные метки
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  confirmedAt DateTime?
+  cancelledAt DateTime?
+}
+
+model Passenger {
+  id String   @id @default(cuid())
+  bookingId String
+  booking Booking  @relation(fields: [bookingId], references: [id])
+  
+  // Главным в брони (кто оформляет)
+  isMainContact Boolean @default(false)
+  
+  firstName String
+  lastName String
+  middleName String? // Отчество
+  
+  birthDate DateTime
+  
+  phone String // Контактный телефон
+  
+  passportSeries String // Серия паспорта
+  passportNumber String // Номер паспорта (6 цифр)
+  passportIssuedBy String // Кем выдан
+  passportIssuedAt DateTime // Дата выдачи
+  passportCode String? // Код подразделения
+  
+  email String?
+
+  medicalCertificates MedicalCertificate[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([passportSeries, passportNumber])
+}
+
+model MedicalCertificate {
+  id String   @id @default(cuid())
+  passengerId String
+  passenger Passenger @relation(fields: [passengerId], references: [id])
+  
+  fileName String
+  fileKey String   @unique
+  fileUrl String
+  fileSize Int
+  
+  status String   @default("pending") // pending, approved, rejected
+  
+  uploadDate DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
