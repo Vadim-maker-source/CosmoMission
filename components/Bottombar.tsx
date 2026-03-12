@@ -16,7 +16,7 @@ const Bottombar = () => {
       window.open(url, '_blank', 'noopener,noreferrer')
   }
   return (
-    <div className="fixed hidden md:block">
+    <div className="fixed hidden md:block z-100">
       <button 
                 onClick={toggleBar} 
                 className={`fixed duration-400 right-5 px-3 py-3 bg-gray-400 rounded-full cursor-pointer hover:bg-gray-500 text-white z-50 ${
@@ -28,34 +28,37 @@ const Bottombar = () => {
         <div className={`
                 w-full fixed left-0 right-0 
                 flex items-center justify-around 
-                bg-[#282828] py-4 z-40
+                bg-[#282828] py-4
                 transition-all duration-500 ease-in-out
                 ${isOpen ? "translate-y-0 bottom-0" : "translate-y-full bottom-0"}
             `}>
-            <div className="flex flex-col gap-4">
-              <img src="/images/logo2.png" alt="Логотип" className="w-10 lg:w-12 aspect-square" />
+            <div className="flex flex-col gap-4 text-white">
+            <div className="flex items-center gap-2 lg:gap-4">
+                        <img src="/images/logo2.png" alt="Логотип" className="w-10 lg:w-12 aspect-square" />
+                        <p className="text-lg lg:text-2xl text-gray-100 font-bold">Космомиссия</p>
+                    </div>
               <p>Автономная некоммерческая организация содействия космическому туризму “Космомиссия”.</p>
             </div>
 
             <div className="flex flex-col items-start">
-                    <p className="text-lg font-bold text-gray-800 mb-1">По всем вопросам:</p>
-                    <p className="text-lg text-left hover:text-[#FF7340] transition-colors cursor-pointer">
+                    <p className="text-lg font-bold text-gray-200 mb-1">По всем вопросам:</p>
+                    <p className="text-lg text-left hover:text-[#FF7340] transition-colors cursor-pointer text-white">
                         Vadimbureev380@yandex.ru
                     </p>
                 </div>
                 
                 <div className="flex flex-col items-start">
-                    <p className="text-lg font-bold text-gray-800 mb-1">Телефон:</p>
-                    <p className="text-lg hover:text-[#FF7340] transition-colors cursor-pointer">
+                    <p className="text-lg font-bold text-gray-200 mb-1">Телефон:</p>
+                    <p className="text-lg hover:text-[#FF7340] transition-colors cursor-pointer text-white">
                         +7 (920) 545-08-62
                     </p>
                 </div>
                 
                 <div className="flex flex-col items-start">
-                    <p className="text-lg font-bold text-gray-800 mb-1">Наш адрес:</p>
+                    <p className="text-lg font-bold text-gray-200 mb-1">Наш адрес:</p>
                     <button
                         onClick={openYandexMaps}
-                        className="text-lg text-left hover:text-[#FF7340] transition-colors cursor-pointer group flex items-center"
+                        className="text-lg text-left hover:text-[#FF7340] transition-colors cursor-pointer group flex items-center text-white"
                     >
                         <span>г.Липецк ул. Космонавтов, 20/3</span>
                         <svg 

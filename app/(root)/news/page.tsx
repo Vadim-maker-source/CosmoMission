@@ -20,20 +20,20 @@ const News = () => {
             </div>
           ))}
         </div>
+              <Link
+                    href="/"
+                    className="inline-flex items-center gap-2 text-purple-300 hover:text-purple-100 mb-6 transition-colors ml-4"
+                  >
+                    <ArrowLeft size={20} />
+                    На главную
+                  </Link>
       <section 
         className="relative h-screen w-full bg-cover bg-center bg-no-repeat items-center px-4 md:px-15 hidden md:flex"
         style={{ backgroundImage: "url('/images/newsgroup.png')" }}
       >
       </section>
 
-      <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-purple-300 hover:text-purple-100 mb-6 transition-colors ml-4"
-          >
-            <ArrowLeft size={20} />
-            На главную
-          </Link>
-      <div className="w-full flex justify-center text-white">
+      <div className="w-full flex justify-center text-white md:hidden">
           <h1 className="text-4xl">Новости</h1>
       </div>
 
