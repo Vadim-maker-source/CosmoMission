@@ -68,7 +68,6 @@ export default function Support() {
       return false
     }
 
-    // Для неавторизованных пользователей проверяем имя и email
     if (!user) {
       if (!formData.name.trim()) {
         toast.error('Введите ваше имя', {
@@ -114,12 +113,10 @@ export default function Support() {
       formDataObj.append('message', formData.message)
       
       if (user?.id) {
-        // Для авторизованного пользователя
         formDataObj.append('userId', user.id)
         formDataObj.append('userEmail', user.email)
         formDataObj.append('userName', `${user.firstName} ${user.lastName}`)
       } else {
-        // Для неавторизованного пользователя
         formDataObj.append('userName', formData.name)
         formDataObj.append('userEmail', formData.email)
       }
@@ -194,53 +191,7 @@ export default function Support() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-1 space-y-4">
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30">
-              <h2 className="text-xl font-bold text-white mb-4">Контакты</h2>
-              
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-purple-400 mt-1" />
-                  <div>
-                    <p className="text-sm text-purple-300">Email</p>
-                    <a href="mailto:support@cosmomission.ru" className="text-white hover:text-purple-300 transition-colors">
-                      Vadimbureev380@yandex.ru
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <MessageSquare className="w-5 h-5 text-purple-400 mt-1" />
-                  <div>
-                    <p className="text-sm text-purple-300">Время работы</p>
-                    <p className="text-white">Круглосуточно, без выходных</p>
-                    <p className="text-sm text-purple-300 mt-1">Среднее время ответа: 2 часа</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-purple-500/30">
-                <p className="text-sm text-purple-300 mb-2">Часто задаваемые вопросы:</p>
-                <ul className="space-y-2 text-sm">
-                  <li>
-                    <Link href="/faq#booking" className="text-purple-400 hover:text-purple-300">
-                      • Как забронировать тур?
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/faq#payment" className="text-purple-400 hover:text-purple-300">
-                      • Способы оплаты
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/faq#documents" className="text-purple-400 hover:text-purple-300">
-                      • Необходимые документы
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+          
 
           <div className="md:col-span-2">
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30">
@@ -381,6 +332,35 @@ export default function Support() {
               </form>
             </div>
           </div>
+
+
+          <div className="md:col-span-1 space-y-4">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30">
+              <h2 className="text-xl font-bold text-white mb-4">Контакты</h2>
+              
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-purple-400 mt-1" />
+                  <div>
+                    <p className="text-sm text-purple-300">Email</p>
+                    <a href="mailto:support@cosmomission.ru" className="text-white hover:text-purple-300 transition-colors">
+                      Vadimbureev380@yandex.ru
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <MessageSquare className="w-5 h-5 text-purple-400 mt-1" />
+                  <div>
+                    <p className="text-sm text-purple-300">Время работы</p>
+                    <p className="text-white">Круглосуточно, без выходных</p>
+                    <p className="text-sm text-purple-300 mt-1">Среднее время ответа: 2 часа</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
