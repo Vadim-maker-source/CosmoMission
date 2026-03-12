@@ -105,6 +105,8 @@ model MedicalCertificate {
   fileSize Int
   
   status String   @default("pending") // pending, approved, rejected
+
+  comment String?
   
   uploadDate DateTime @default(now())
   updatedAt DateTime @updatedAt

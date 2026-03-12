@@ -24,7 +24,6 @@ import {
   Luggage,
   Plane,
   Globe,
-  Package,
   Sparkles,
   Gift,
   Activity,
@@ -36,7 +35,7 @@ import {
 import { getUserBookings, cancelBooking, deleteMedicalCertificate, getCertificateDownloadUrl, uploadCertificateAction } from '@/app/lib/api/booking'
 import { getCurrentUser } from '@/app/lib/api/user'
 import { User } from '@/app/lib/types'
-import { SPACE_PATHS, AVAILABLE_SERVICES, SpacePath, Service } from '@/app/lib/ways'
+import { SPACE_PATHS, SpacePath } from '@/app/lib/ways'
 import { toast } from 'sonner'
 import { format, addDays } from 'date-fns'
 import { ru } from 'date-fns/locale'
@@ -149,11 +148,11 @@ export default function BookingsPage() {
   }, [router])
 
   const generateItinerary = (booking: Booking): DayActivity[] => {
-    const a: DayActivity[] = []
+    const itinerary: DayActivity[] = []
     const startDate = new Date(booking.departureDate)
     let currentDay = 1
     
-    a.push({
+    itinerary.push({
       day: currentDay++,
       date: format(addDays(startDate, 0), 'd MMMM yyyy', { locale: ru }),
       location: 'Земля',
@@ -235,26 +234,12 @@ export default function BookingsPage() {
           dayActivities.highlights = [`Уникальные виды ${path.name}`]
         }
 
-        const selectedForStation = booking.selectedServices?.filter(
-          s => s.stationId === pathId
-        ) || []
-
-        selectedForStation.forEach(service => {
-          const serviceInfo = AVAILABLE_SERVICES.find(s => s.id === service.serviceId)
-          if (serviceInfo) {
-            for (let i = 0; i < service.quantity; i++) {
-              dayActivities.activities.push(`✨ ${serviceInfo.name}`)
-              dayActivities.highlights.push(serviceInfo.description)
-            }
-          }
-        })
-
-        a.push(dayActivities)
+        itinerary.push(dayActivities)
       }
 
       if (index < booking.routeIds.length - 1) {
         const nextPath = SPACE_PATHS.find(p => p.id === booking.routeIds[index + 1])
-        a.push({
+        itinerary.push({
           day: currentDay++,
           date: format(addDays(startDate, currentDay - 2), 'd MMMM yyyy', { locale: ru }),
           location: 'Межпланетный перелет',
@@ -272,7 +257,7 @@ export default function BookingsPage() {
       }
     })
 
-    a.push({
+    itinerary.push({
       day: currentDay++,
       date: format(addDays(startDate, currentDay - 2), 'd MMMM yyyy', { locale: ru }),
       location: 'Земля',
@@ -289,7 +274,7 @@ export default function BookingsPage() {
       highlights: ['Вид на планету при спуске', 'Воссоединение с гравитацией']
     })
 
-    return a
+    return itinerary
   }
 
   const handleCancelBooking = async (bookingId: string) => {
@@ -469,7 +454,7 @@ export default function BookingsPage() {
     return (
       <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center flex flex-col justify-center items-center">
-          <Loader2 className="text-purple-400 w-8 h-8" />
+          <Loader2 className="text-purple-400 w-8 h-8 animate-spin" />
           <p className="text-purple-200 mt-4">Загрузка...</p>
         </div>
       </div>
@@ -688,34 +673,7 @@ export default function BookingsPage() {
                           ))}
                         </div>
 
-                        {/* Дополнительные услуги */}
-                        {booking.selectedServices && booking.selectedServices.length > 0 && (
-                          <div className="mt-6">
-                            <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                              <Gift size={18} className="text-purple-400" />
-                              Дополнительные услуги
-                            </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {booking.selectedServices.map((service, idx) => {
-                                const serviceInfo = AVAILABLE_SERVICES.find(s => s.id === service.serviceId)
-                                const path = getPathInfo(service.stationId)
-                                return (
-                                  <div key={idx} className="bg-white/5 rounded-lg p-3 border border-purple-500/30">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <span className="text-xl">{serviceInfo?.icon || '✨'}</span>
-                                      <span className="text-white font-medium">{serviceInfo?.name}</span>
-                                      <span className="text-xs text-purple-300">x{service.quantity}</span>
-                                    </div>
-                                    <p className="text-xs text-purple-300 mb-1">{path?.icon} {path?.name}</p>
-                                    <p className="text-xs text-purple-200">{serviceInfo?.description}</p>
-                                  </div>
-                                )
-                              })}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Пассажиры и справки (свернуто для краткости) */}
+                        {/* Пассажиры и справки */}
                         <div className="mt-8">
                           <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                             <Users size={18} className="text-purple-400" />
