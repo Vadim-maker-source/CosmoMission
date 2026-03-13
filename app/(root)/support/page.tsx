@@ -190,7 +190,7 @@ export default function Support() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="flex flex-col gap-6">
           
 
           <div className="md:col-span-2">

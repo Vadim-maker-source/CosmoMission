@@ -6,6 +6,7 @@ import { transporter } from "../email";
 import { User } from "../types";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth";
+import { revalidatePath } from "next/cache";
 
 export type RegisterData = {
     firstName: string;
@@ -213,5 +214,79 @@ export async function getUserById(id: string): Promise<User | null> {
     } catch (error) {
       console.error(error);
       return null;
+    }
+  }
+
+  export async function updateUserProfile(data: {
+    userId: string
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    age: number
+    region?: string
+  }) {
+    try {
+      const existingUser = await prisma.user.findUnique({
+        where: { id: data.userId }
+      })
+  
+      if (!existingUser) {
+        return { success: false, error: 'Пользователь не найден' }
+      }
+  
+      if (data.email !== existingUser.email) {
+        const userWithEmail = await prisma.user.findUnique({
+          where: { email: data.email }
+        })
+        if (userWithEmail) {
+          return { success: false, error: 'Пользователь с таким email уже существует' }
+        }
+      }
+  
+      if (data.age < 18 || data.age > 120) {
+        return { success: false, error: 'Возраст должен быть от 18 до 120 лет' }
+      }
+  
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(data.email)) {
+        return { success: false, error: 'Неверный формат email' }
+      }
+  
+      const updatedUser = await prisma.user.update({
+        where: { id: data.userId },
+        data: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email.toLowerCase(),
+          phone: data.phone,
+          age: data.age,
+          region: data.region,
+        },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          age: true,
+          phone: true,
+          role: true,
+          avatar: true,
+          region: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      })
+  
+      revalidatePath(`/profile/${data.userId}`)
+      revalidatePath(`/profile/${data.userId}/edit`)
+  
+      return {
+        success: true,
+        user: updatedUser
+      }
+    } catch (error) {
+      console.error(error)
+      return { success: false, error: 'Не удалось обновить профиль' }
     }
   }

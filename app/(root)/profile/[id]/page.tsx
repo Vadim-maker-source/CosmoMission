@@ -116,6 +116,10 @@ export default function ProfilePage({ params }: PageProps) {
     }
   }
 
+  const inDeveloping = () => {
+    toast.warning("Упс! Этот раздел ещё в разработке!")
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
@@ -306,7 +310,7 @@ export default function ProfilePage({ params }: PageProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link
             href={`/profile/${user.id}/booking`}
-            className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30 hover:bg-white/20 transition-all group"
+            className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30 hover:bg-white/20 transition-all"
           >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-linear-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -320,26 +324,26 @@ export default function ProfilePage({ params }: PageProps) {
           </Link>
 
           {currentUser.id === user.id && (
-            <Link
-              href={`/profile/${user.id}/settings`}
-              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30 hover:bg-white/20 transition-all group"
+            <button
+              onClick={inDeveloping}
+              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30 hover:bg-white/20 transition-all cursor-pointer"
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-linear-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Settings className="w-6 h-6 text-white" />
                 </div>
-                <div>
+                <div className="flex flex-col items-start">
                   <h3 className="text-xl font-bold text-white mb-1">Настройки</h3>
                   <p className="text-purple-300 text-sm">Изменить личные данные</p>
                 </div>
               </div>
-            </Link>
+            </button>
           )}
 
           {currentUser.role === 'ADMIN' && (
             <Link
               href="/admin"
-              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30 hover:bg-white/20 transition-all group md:col-span-2"
+              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30 hover:bg-white/20 transition-all md:col-span-2"
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-linear-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -355,7 +359,7 @@ export default function ProfilePage({ params }: PageProps) {
 
           <Link
             href="/booking"
-            className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30 hover:bg-white/20 transition-all group md:col-span-2"
+            className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30 hover:bg-white/20 transition-all md:col-span-2"
           >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-linear-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">

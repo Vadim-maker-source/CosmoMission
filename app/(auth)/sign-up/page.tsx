@@ -19,9 +19,11 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
-import { Star, Rocket } from 'lucide-react';
+import { Star, Rocket, Search } from 'lucide-react';
 import { generateVerificationCode } from '@/app/lib/code';
 import { toast } from 'sonner';
+import { AddressSuggestions, DaDataSuggestion, DaDataAddress } from 'react-dadata';
+import 'react-dadata/dist/react-dadata.css';
 
 type FormData = {
   firstName: string;
@@ -47,6 +49,9 @@ export default function SignUp() {
   const [otpCooldown, setOtpCooldown] = useState(0);
   const [generatedCode, setGeneratedCode] = useState('');
   
+  // Состояние для выбранного региона в формате Dadata
+  const [selectedRegion, setSelectedRegion] = useState<DaDataSuggestion<DaDataAddress> | undefined>();
+  
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -57,6 +62,9 @@ export default function SignUp() {
     confirmPassword: '',
     region: '',
   });
+
+  // Токен для Dadata (получите на https://dadata.ru/api/)
+  const DADATA_TOKEN = process.env.NEXT_PUBLIC_DADATA_TOKEN || '';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -71,6 +79,19 @@ export default function SignUp() {
       ...prev,
       phone: value
     }));
+  };
+
+  const handleRegionSelect = (suggestion: DaDataSuggestion<DaDataAddress> | undefined) => {
+    setSelectedRegion(suggestion);
+    if (suggestion && suggestion.data) {
+      // Формируем полный адрес
+      const region = suggestion.data.region || 
+                     suggestion.data.city || 
+                     suggestion.data.settlement || 
+                     suggestion.data.street || 
+                     suggestion.value;
+      setFormData(prev => ({ ...prev, region }));
+    }
   };
 
   const validateStep1 = () => {
@@ -397,41 +418,54 @@ export default function SignUp() {
                 </div>
                 
                 <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-purple-200">
-        Телефон *
-      </label>
-      <PhoneInput
-        country={'ru'}
-        value={formData.phone}
-        onChange={handlePhoneChange}
-        inputProps={{
-          name: 'phone',
-          required: true,
-        }}
-        containerClass="phone-input-container"
-        buttonClass="phone-input-button"
-        dropdownClass="phone-input-dropdown"
-        searchClass="phone-input-search"
-        enableSearch={true}
-        searchPlaceholder="Поиск страны..."
-        disableSearchIcon={true}
-        placeholder="+7 (999) 123-45-67"
-      />
+                  <label htmlFor="phone" className="block text-sm font-medium text-purple-200">
+                    Телефон *
+                  </label>
+                  <PhoneInput
+                    country={'ru'}
+                    value={formData.phone}
+                    onChange={handlePhoneChange}
+                    inputProps={{
+                      name: 'phone',
+                      required: true,
+                    }}
+                    containerClass="phone-input-container"
+                    buttonClass="phone-input-button"
+                    dropdownClass="phone-input-dropdown"
+                    searchClass="phone-input-search"
+                    enableSearch={true}
+                    searchPlaceholder="Поиск страны..."
+                    disableSearchIcon={true}
+                    placeholder="+7 (999) 123-45-67"
+                  />
                 </div>
 
                 <div>
                   <label htmlFor="region" className="block text-sm font-medium text-purple-200">
                     Регион
                   </label>
-                  <input
-                    id="region"
-                    name="region"
-                    type="text"
-                    value={formData.region}
-                    onChange={handleInputChange}
-                    className="mt-1 appearance-none relative block w-full px-3 py-2 bg-white/5 border border-purple-500/30 rounded-lg placeholder-purple-300 text-white focus:outline-none focus:ring-purple-400 focus:border-purple-400 focus:z-10 sm:text-sm"
-                    placeholder="Ваш регион"
-                  />
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400 w-5 h-5 z-10 pointer-events-none" />
+                    <AddressSuggestions
+                      token={DADATA_TOKEN}
+                      value={selectedRegion}
+                      onChange={handleRegionSelect}
+                      inputProps={{
+                        placeholder: 'Начните вводить название региона...',
+                        className: `w-full pl-10 pr-4 py-2 bg-white/5 border border-purple-500/30 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-colors`,
+                      }}
+                      filterLocations={[
+                        { country: 'Россия' },
+                        { country: 'Беларусь' },
+                        { country: 'BY' },
+                        { country: 'RU' }
+                      ]}
+                      count={5}
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-purple-300">
+                    Начните вводить название региона, города или населенного пункта
+                  </p>
                 </div>
               </div>
             )}
@@ -597,6 +631,161 @@ export default function SignUp() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Стили для PhoneInput */}
+      <style jsx global>{`
+        .phone-input-container {
+          width: 100% !important;
+          margin-top: 0.25rem !important;
+        }
+        
+        .phone-input-container .react-tel-input {
+          width: 100% !important;
+          font-family: inherit !important;
+        }
+        
+        .phone-input-container .form-control {
+          width: 100% !important;
+          height: 42px !important;
+          background: rgba(255, 255, 255, 0.05) !important;
+          border: 1px solid rgba(139, 92, 246, 0.3) !important;
+          border-radius: 0.5rem !important;
+          color: white !important;
+          font-size: 0.875rem !important;
+          padding-left: 52px !important;
+          padding-right: 12px !important;
+          transition: all 0.2s ease !important;
+        }
+        
+        .phone-input-container .form-control::placeholder {
+          color: rgba(216, 180, 254, 0.5) !important;
+        }
+        
+        .phone-input-container .form-control:focus {
+          border-color: #a78bfa !important;
+          box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2) !important;
+          outline: none !important;
+          background: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        .phone-input-container .flag-dropdown {
+          background: rgba(255, 255, 255, 0.05) !important;
+          border: 1px solid rgba(139, 92, 246, 0.3) !important;
+          border-radius: 0.5rem 0 0 0.5rem !important;
+          transition: all 0.2s ease !important;
+        }
+        
+        .phone-input-container .flag-dropdown:hover {
+          background: rgba(255, 255, 255, 0.15) !important;
+        }
+        
+        .phone-input-container .flag-dropdown.open {
+          background: rgba(255, 255, 255, 0.2) !important;
+          border-color: #a78bfa !important;
+        }
+        
+        .phone-input-container .selected-flag {
+          background-color: transparent !important;
+          padding-left: 10px !important;
+          width: 46px !important;
+        }
+        
+        .phone-input-container .selected-flag:hover {
+          background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        .phone-input-container .selected-flag .flag {
+          transform: scale(1.1) !important;
+        }
+        
+        .phone-input-container .selected-flag .arrow {
+          border-top-color: rgba(255, 255, 255, 0.8) !important;
+          right: 6px !important;
+        }
+        
+        .phone-input-container .selected-flag .arrow.up {
+          border-bottom-color: rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        .phone-input-dropdown {
+          background: #1a1f2f !important;
+          border: 1px solid rgba(139, 92, 246, 0.3) !important;
+          border-radius: 0.5rem !important;
+          color: white !important;
+          margin-top: 4px !important;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+          max-height: 300px !important;
+          overflow-y: auto !important;
+          z-index: 1000 !important;
+        }
+        
+        .phone-input-dropdown .country {
+          color: white !important;
+          padding: 10px 12px !important;
+          display: flex !important;
+          align-items: center !important;
+          gap: 8px !important;
+          transition: background 0.2s ease !important;
+        }
+        
+        .phone-input-dropdown .country:hover {
+          background: rgba(139, 92, 246, 0.2) !important;
+        }
+        
+        .phone-input-dropdown .country.highlight {
+          background: rgba(139, 92, 246, 0.3) !important;
+        }
+        
+        .phone-input-dropdown .country .flag {
+          transform: scale(1.1) !important;
+          margin-right: 8px !important;
+        }
+        
+        .phone-input-dropdown .country-name {
+          margin-right: 8px !important;
+        }
+        
+        .phone-input-dropdown .dial-code {
+          color: rgba(216, 180, 254, 0.7) !important;
+        }
+        
+        .phone-input-search {
+          background: rgba(255, 255, 255, 0.05) !important;
+          border: 1px solid rgba(139, 92, 246, 0.3) !important;
+          border-radius: 0.5rem !important;
+          color: white !important;
+          padding: 10px 12px !important;
+          margin: 8px !important;
+          width: calc(100% - 16px) !important;
+        }
+        
+        .phone-input-search::placeholder {
+          color: rgba(216, 180, 254, 0.5) !important;
+        }
+        
+        .phone-input-search:focus {
+          border-color: #a78bfa !important;
+          outline: none !important;
+        }
+        
+        .phone-input-dropdown::-webkit-scrollbar {
+          width: 6px !important;
+        }
+        
+        .phone-input-dropdown::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05) !important;
+          border-radius: 3px !important;
+        }
+        
+        .phone-input-dropdown::-webkit-scrollbar-thumb {
+          background: rgba(139, 92, 246, 0.5) !important;
+          border-radius: 3px !important;
+        }
+        
+        .phone-input-dropdown::-webkit-scrollbar-thumb:hover {
+          background: rgba(139, 92, 246, 0.7) !important;
+        }
+      `}</style>
     </>
   );
 }
